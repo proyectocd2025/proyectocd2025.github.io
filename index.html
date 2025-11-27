@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto Ciencia de Datos: Terremotos en Chile</title>
+    <style>
+        /* Paleta de Colores: Naranja (Magnitud), Azul Marino (Fondo Oscuro), Gris Claro (Fondo Secundario) */
+        :root {
+            --color-primary: #FF8C00; /* Naranja Brillante (Magnitud/Barras) */
+            --color-secondary: #00284D; /* Azul Marino Oscuro (Fondo Principal) */
+            --color-text-light: #F5F5F5; /* Texto Claro */
+            --color-text-dark: #333;
+            --color-accent: #E03B2A; /* Rojo Acento (Riesgo) */
+            --color-card-bg: #FFFFFF; /* Fondo de Tarjeta */
+            --color-section-bg: #1A3E60; /* Fondo de sección (Azul intermedio) */
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-secondary); /* Fondo oscuro atractivo */
+            color: var(--color-text-dark);
+        }
+
+        .header {
+            background: var(--color-primary);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            letter-spacing: 1.5px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .section-box {
+            background: var(--color-card-bg);
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .section-box h2 {
+            color: var(--color-secondary);
+            border-bottom: 3px solid var(--color-primary);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        .section-box h3 {
+            color: var(--color-accent);
+        }
+        
+        /* Estilo para las secciones de resultados */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .result-card {
+            background: #F0F8FF; /* Azul muy claro */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .result-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--color-accent);
+            margin: 5px 0;
+        }
+        
+        .graph-item {
+            width: 100%;
+            margin: 20px 0;
+            text-align: center;
+            border: 1px solid #eee;
+            padding: 10px;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        
+        .metadata-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .metadata-table th, .metadata-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .metadata-table th {
+            background-color: var(--color-section-bg);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>PROYECTO DE INVESTIGACIÓN</h1>
+        <h1>ANÁLISIS DE TERREMOTOS EN CHILE</h1>
+    </div>
+
+    <div class="container">
+        
+        <div class="section-box">
+            <h2>Motivación y Contexto</h2>
+            <p>Dado que vivimos en uno de los países más sísmicos de América Latina y el mundo entero, consideramos indispensable el conocimiento sobre este fenómeno natural; lo que más atrae nuestro interés fue poder conocer las regiones en que mayor cantidad de terremotos se han producido, sabemos que existen métodos de advertencia sísmica pero queremos encontrar más métodos que puedan ayudar al país a prevenir estas catástrofes, esperamos que en base a los datos podamos encontrar un modelo que nos ayude a predecir los terremotos en los puntos más críticos de las regiones del país.</p>
+            <h2>Objetivo</h2>
+            <p>Con este proyecto esperamos poder identificar las regiones de Chile que más se han visto afectadas, así como también sus respuestas frente a estos sucesos, de modo que podamos reconocer los sectores que menos preparados se encuentran para un eventual sismo; las autoridades regionales se beneficiarían de esta información pues les ayuda a medir su preparación para posibles terremotos, la población también se beneficia por el conocimiento de esta información. Queremos calcular las zonas de mayor riesgo y observar cada cierto tiempo ocurren. Esperamos poder conseguir un método que pueda ayudar a predecir la eventual ocurrencia de estas catástrofes.</p>
+            <h2>Datos</h2>
+            <p>Los datos serán extraídos de una fuente pública, de la organización USGS Scientific Research Results, en este link pueden encontrar la página de donde se extrae 
+                <a href="https://www.usgs.gov/programs/earthquake-hazards/earthquakes" target="_blank">USGS.gov/earthquake-hazards/earthquakes</a> información. 
+                La información obtenida es en formato .csv, que fue descargada mediante el siguiente link: 
+                <a href="https://earthquake.usgs.gov/earthquakes/search/" target="_blank">earthquake.usgs.gov/earthquakes/search/</a>. 
+                Dicho documento descargado viene en un formato estructurado, tiene un peso de 1.7mb, y al convertirlo en Data Frame tiene más de 10.000 filas y 22 columnas con información como: tiempo, latitud, longitud, ubicación, magnitud, escala, entre otros. 
+                Más información la pueden encontrar en nuestro repositorio de Github en el siguiente link: 
+                <a href="https://github.com/Skysilen-t/Proyecto-Ciencia-de-Datos/tree/main/Propuesta%20y%20documento" target="_blank">Repositorio de Github (Skysilen-t)</a>.
+            </p>
+        </div>
+
+    <div class="header">
+        <h1>PREGUNTAS DE INVESTIGACIÓN</h1>
+    </div>
+
+        <div class="section-box">
+            <h2>1.¿Que información es posible conocer mediante estos datos?</h2>
+            <p>Primero partamos observando la información con la que trabajaremos para tener una idea de los datos.</p>
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Datos Sísmicos - Tabla de Información</title>
+                <style>
+                    * {
+                        box-sizing: border-box;
+                        margin: 0;
+                        padding: 0;
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    }
+                    
+                    body {
+                        background: linear-gradient(135deg, #1a2a6c, #b21f1f, #011220c5);
+                        color: #333;
+                        line-height: 1.6;
+                        padding: 20px;
+                        min-height: 100vh;
+                    }
+                    
+                    .container {
+                        max-width: 1200px;
+                        margin: 0 auto;
+                    }
+                    
+                    header {
+                        text-align: center;
+                        margin-bottom: 30px;
+                        padding: 20px;
+                        background-color: rgba(255, 255, 255, 0.9);
+                        border-radius: 10px;
+                        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                    }
+                    
+                    h1 {
+                        color: #1a2a6c;
+                        margin-bottom: 10px;
+                        font-size: 2.5rem;
+                    }
+                    
+                    .subtitle {
+                        color: #b21f1f;
+                        font-size: 1.2rem;
+                        font-weight: 500;
+                    }
+                    
+                    .table-container {
+                        overflow-x: auto;
+                        background-color: rgba(255, 255, 255, 0.95);
+                        border-radius: 10px;
+                        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                        padding: 20px;
+                        margin-bottom: 30px;
+                    }
+                    
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        min-width: 800px;
+                    }
+                    
+                    th, td {
+                        padding: 15px;
+                        text-align: left;
+                        border-bottom: 1px solid #ddd;
+                    }
+                    
+                    th {
+                        background-color: #1a2a6c;
+                        color: white;
+                        font-weight: 600;
+                        position: sticky;
+                        top: 0;
+                    }
+                    
+                    tr:nth-child(even) {
+                        background-color: #f9f9f9;
+                    }
+                    
+                    tr:hover {
+                        background-color: #f1f1f1;
+                        transition: background-color 0.3s;
+                    }
+                    
+                    .highlight {
+                        font-weight: bold;
+                        color: #b21f1f;
+                    }
+                    
+                    .footer {
+                        text-align: center;
+                        padding: 20px;
+                        background-color: rgba(255, 255, 255, 0.9);
+                        border-radius: 10px;
+                        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                        font-size: 0.9rem;
+                        color: #555;
+                    }
+                    
+                    @media (max-width: 768px) {
+                        h1 {
+                            font-size: 2rem;
+                        }
+                        
+                        th, td {
+                            padding: 10px;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <header>
+                        <h1>Datos Sísmicos</h1>
+                        <p class="subtitle">Información detallada sobre parámetros de terremotos</p>
+                    </header>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Parámetro</th>
+                                    <th>Clave</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="highlight">Coordenadas</span></td>
+                                    <td>latitude y longitude</td>
+                                    <td>Corresponden a la ubicación geospacial del sismo</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="highlight">Profundidad</span></td>
+                                    <td>depth</td>
+                                    <td>Corresponden a la profundidad en que se registra el sismo</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="highlight">Fallo en profundidad</span></td>
+                                    <td>depthError</td>
+                                    <td>Falta de certeza en los registros de profundidad</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="highlight">Magnitud</span></td>
+                                    <td>mag</td>
+                                    <td>Magnitud registrada del sismo</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="highlight">Fallo en magnitud</span></td>
+                                    <td>magError</td>
+                                    <td>Posible fallo en la medición de la magnitud</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="highlight">Tipo de magnitud</span></td>
+                                    <td>magType</td>
+                                    <td>Forma en que fue registrada la magnitud</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="highlight">Estaciones en el registro</span></td>
+                                    <td>magNst</td>
+                                    <td>Es la cantidad de estaciones utilizadas para registrar el terremoto</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="highlight">Estaciones usadas</span></td>
+                                    <td>nst</td>
+                                    <td>Cantidad de estaciones usadas para determinar la ubicación del sismo</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="highlight">Brecha entre estaciones</span></td>
+                                    <td>gap</td>
+                                    <td>Desde un punto de referencia, es la mayor brecha entre dos estaciones (en grados)</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="highlight">Distancia estación-terremoto</span></td>
+                                    <td>dmin</td>
+                                    <td>Distancia en grados desde el epicentro a la estación más cercana</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="highlight">RMS</span></td>
+                                    <td>rms</td>
+                                    <td>Utilizado para medir la magnitud de la señal que varía en el tiempo</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="highlight">ID</span></td>
+                                    <td>id</td>
+                                    <td>Identificador asociado al evento</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="highlight">Fallo en ubicación</span></td>
+                                    <td>horizontalError</td>
+                                    <td>Falta de certeza en la ubicación del sismo</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="highlight">Fecha</span></td>
+                                    <td>date</td>
+                                    <td>Fecha en que ocurrió el evento</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="highlight">Hora</span></td>
+                                    <td>hour</td>
+                                    <td>Hora en que ocurrió el evento</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="highlight">Zona</span></td>
+                                    <td>zone</td>
+                                    <td>Comuna/Ciudad en que ocurrió el evento</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="highlight">Región</span></td>
+                                    <td>region</td>
+                                    <td>Región en que ocurrió el evento</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+            </body>
+            </html>
+
+        <div class="section-box">
+            <h2>2. Calcular los mayores terremotos por región</h2>
+            <p>De nuestra investigación obtenemos la siguiente tabla</p>
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <title>Tabla de Datos Sísmicos</title>
+                <style>
+                    /* Estilos CSS para la tabla */
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-family: monospace; /* Fuente monoespaciada para datos */
+                        font-size: 14px;
+                    }
+                    th, td {
+                        border: 1px solid #444;
+                        padding: 8px 12px;
+                        text-align: left;
+                    }
+                    th {
+                        background-color: #333;
+                        color: white;
+                        text-transform: uppercase;
+                    }
+                    /* Estilo para filas pares/impares */
+                    tr:nth-child(even) {
+                        background-color: #f2f2f2;
+                    }
+                </style>
+            </head>
+            <body>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>latitude</th>
+                            <th>longitude</th>
+                            <th>mag</th>
+                            <th>magType</th>
+                            <th>date</th>
+                            <th>zone</th>
+                            <th>region</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>0</td>
+                            <td>-53.9960</td>
+                            <td>-70.0570</td>
+                            <td>7.58</td>
+                            <td>mw</td>
+                            <td>1949-12-17</td>
+                            <td>Punta Arenas</td>
+                            <td>Magallanes</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>-46.7807</td>
+                            <td>-75.6402</td>
+                            <td>6.30</td>
+                            <td>mww</td>
+                            <td>2024-11-08</td>
+                            <td>Cochrane</td>
+                            <td>Aysén</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>-43.4064</td>
+                            <td>-73.9413</td>
+                            <td>7.60</td>
+                            <td>mww</td>
+                            <td>2016-12-25</td>
+                            <td>Quellón</td>
+                            <td>Los Lagos</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>-38.1430</td>
+                            <td>-73.4070</td>
+                            <td>9.50</td>
+                            <td>mw</td>
+                            <td>1960-05-22</td>
+                            <td>Valdivia</td>
+                            <td>Los Ríos</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>-38.0610</td>
+                            <td>-73.0390</td>
+                            <td>7.80</td>
+                            <td>mw</td>
+                            <td>1960-05-22</td>
+                            <td>Traiguén</td>
+                            <td>Araucanía</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>-37.8240</td>
+                            <td>-73.3530</td>
+                            <td>8.10</td>
+                            <td>mw</td>
+                            <td>1960-05-21</td>
+                            <td>Cañete</td>
+                            <td>Biobío</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>-36.2960</td>
+                            <td>-72.2130</td>
+                            <td>7.85</td>
+                            <td>mw</td>
+                            <td>1939-01-25</td>
+                            <td>San Carlos</td>
+                            <td>Ñuble</td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>-36.1220</td>
+                            <td>-72.8980</td>
+                            <td>8.80</td>
+                            <td>mww</td>
+                            <td>2010-02-27</td>
+                            <td>Maule</td>
+                            <td>Maule</td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>-34.3260</td>
+                            <td>-71.7990</td>
+                            <td>7.00</td>
+                            <td>mwc</td>
+                            <td>2010-03-11</td>
+                            <td>Santa Cruz</td>
+                            <td>Libertador General Bernardo O'Higgins</td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>-33.8320</td>
+                            <td>-69.9580</td>
+                            <td>6.81</td>
+                            <td>mw</td>
+                            <td>1958-09-04</td>
+                            <td>Puente Alto</td>
+                            <td>Región Metropolitana</td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>-32.4000</td>
+                            <td>-71.4000</td>
+                            <td>8.20</td>
+                            <td>mw</td>
+                            <td>1906-08-17</td>
+                            <td>Valparaíso</td>
+                            <td>Valparaíso</td>
+                        </tr>
+                        <tr>
+                            <td>11</td>
+                            <td>-31.5729</td>
+                            <td>-71.6744</td>
+                            <td>8.30</td>
+                            <td>mww</td>
+                            <td>2015-09-16</td>
+                            <td>Illapel</td>
+                            <td>Coquimbo</td>
+                        </tr>
+                        <tr>
+                            <td>12</td>
+                            <td>-28.2930</td>
+                            <td>-69.8520</td>
+                            <td>8.50</td>
+                            <td>mw</td>
+                            <td>1922-11-11</td>
+                            <td>Vallenar</td>
+                            <td>Atacama</td>
+                        </tr>
+                        <tr>
+                            <td>13</td>
+                            <td>-23.3400</td>
+                            <td>-70.2940</td>
+                            <td>8.00</td>
+                            <td>mw</td>
+                            <td>1995-07-30</td>
+                            <td>Antofagasta</td>
+                            <td>Antofagasta</td>
+                        </tr>
+                        <tr>
+                            <td>14</td>
+                            <td>-19.6097</td>
+                            <td>-70.7691</td>
+                            <td>8.20</td>
+                            <td>mww</td>
+                            <td>2014-04-01</td>
+                            <td>Iquique</td>
+                            <td>Tarapacá</td>
+                        </tr>
+                        <tr>
+                            <td>15</td>
+                            <td>-19.0220</td>
+                            <td>-69.9910</td>
+                            <td>7.20</td>
+                            <td>mw</td>
+                            <td>1987-08-08</td>
+                            <td>Arica</td>
+                            <td>Arica y Parinacota</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </body>
+            </html>
+            <p>Ahora observemos una gráfica de estos datos para visualizarlos mejor.</p>
+            <img src="grafico1.png">
+            <p>Ahora veamos estas ubicaciones en un mapa de Chile</p>
+            <img src="mapa1.png" width="1000" height="1000">
+        </div>
+
+        <div class="section-box">
+            <h2>3. Analizar los terremotos acontecidos en el país y obtener las regiones y ciudades de mayores riesgos, permitiendo calcular el área de mayor riesgo en el país</h2>
+            <p>Primeros observemos como es la distribución de terremotos acontecidos en el país en el trascurso de los años.</p>
+            <img src="mapa2.png" width="1000" height="1000">
+            <p>Podemos ver una mayor distribución en la zona centro y norte del país, en la zona sur cerca de la Patagonia podemos ver que no es tan afectada.</p>
+            <p>Observemos como es la distribución de la frecuencia de terremotos por regiones, para esto te compartimos esta tabla y una gráfica.</p>
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <title>Conteo de Sismos por Región (Completo y Corregido)</title>
+                <style>
+                    /* Estilos CSS para el look tipo DataFrame oscuro (Mismo estilo anterior) */
+                    table {
+                        width: 400px;
+                        border-collapse: collapse;
+                        font-family: monospace;
+                        font-size: 14px;
+                        background-color: #262626; 
+                        color: #f0f0f0; 
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+                    }
+                    th, td {
+                        border: none;
+                        padding: 8px 12px;
+                        text-align: right; 
+                    }
+                    th {
+                        background-color: #333; 
+                        color: #ddd; 
+                        font-weight: normal;
+                        border-bottom: 2px solid #555;
+                    }
+                    /* Alineación y estilo para índice y región */
+                    td:nth-child(1), th:nth-child(1) {
+                        text-align: left; 
+                        color: #a8a8a8; 
+                    }
+                    td:nth-child(2), th:nth-child(2) {
+                        text-align: left; 
+                        width: 50%;
+                    }
+                    /* Estilos para las filas de datos */
+                    tbody tr {
+                        border-bottom: 1px solid #444; 
+                    }
+                    /* Resalta las filas para que coincida con el patrón de sombreado */
+                    tbody tr:nth-child(even) {
+                        background-color: #383838; /* Fila oscura, para simular el look del DataFrame */
+                    }
+                </style>
+            </head>
+            <body>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>REGION</th>
+                            <th>COUNTS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0</td><td>Antofagasta</td><td>1910</td></tr>
+                        <tr><td>1</td><td>Araucanía</td><td>172</td></tr>
+                        <tr><td>2</td><td>Arica y Parinacota</td><td>127</td></tr>
+                        <tr><td>3</td><td>Atacama</td><td>825</td></tr>
+                        <tr><td>4</td><td>Aysén</td><td>27</td></tr>
+                        <tr><td>5</td><td>Biobío</td><td>809</td></tr>
+                        <tr><td>6</td><td>Coquimbo</td><td>1614</td></tr>
+                        <tr><td>7</td><td>Libertador General Bernardo O'Higgins</td><td>294</td></tr>
+                        <tr><td>8</td><td>Los Lagos</td><td>147</td></tr>
+                        <tr><td>9</td><td>Los Ríos</td><td>89</td></tr>
+                        <tr><td>10</td><td>Magallanes</td><td>4</td></tr>
+                        <tr><td>11</td><td>Maule</td><td>544</td></tr>
+                        <tr><td>12</td><td>Región Metropolitana</td><td>66</td></tr>
+                        <tr><td>13</td><td>Tarapacá</td><td>1025</td></tr>
+                        <tr><td>14</td><td>Valparaíso</td><td>1234</td></tr>
+                        <tr><td>15</td><td>Ñuble</td><td>89</td></tr>
+                    </tbody>
+                </table>
+
+            </body>
+            </html>
+            <img src="grafico3.png">
+            <p>Siendo las regiones de Antofagasta, Coquimbo, Valparaíso y Tarapacá las más afectadas.</p>
+            <p>Veamos ahora como seria la distribución, pero por ciudades, para ello solo graficaremos las 20 ciudades más afectadas para una mejor visualización.</p>
+            <img src="grafico4.png" width="1000" height="1000">
+            <p>Obtenemos que Iquique es la ciudad más afectada, donde su frecuencia llega casi hasta los 1000. Para que puedan conocer cuales son las zonas afectadas pueden ver la siguiente imagen que muestra todos los terremotos cercanos que han afectado a la ciudad.</p>
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <title>Página Principal</title>
+            </head>
+            <body>
+                <h1>Mapa interactivos</h1>
+
+                <iframe 
+                    src="mapa_iquique.html" 
+                    width="100%" 
+                    height="500px" 
+                    title="Contenido Importado">
+                </iframe>
+            </body>
+            </html>
+        
+        <div class="section-box">
+            <h2>Crear un promedio de tiempo en el que pueda predecir cada cuanto puede acontecer un terremoto</h2>
+            <img src="grafico5.png">
+            <p>En el análisis de los 9,484 sismos en Chile, que abarcan desde el 19 de marzo de 1904 hasta el 1 de septiembre de 2025, corroboramos que los datos corresponden a magnitudes >= 4.5, con un máximo de 9.5. Esto podemos verificarlo, ya que el único sismo de 9.5 ocurrió en Chile. Sus percentiles se encuentran dentro del rango de 4.5 a 5.1, donde se ubica la mayoría de los sismos superiores a 4.5 y vemos que el grafico los datos estan bien relacionado ya que cada magnitud se disminuye mas del 50% en comparacion a su magnitud anterior pero a la vez hay una escesiva cantidad de sismo entre 4.5 a 5. En conclusión, los datos del dataframe en la columna de magnitud están correctos. Al analizar los datos de magnitud, podemos observar que predominan dos tipos principales: "mb", con 6,170 casos, que es la escala más común para medir sismos entre magnitudes 4 y 6.5; y "Mw" y sus variantes, con 2,873 casos en total, que se utiliza para medir sismos en un rango de 0 a 9.5. Para el análisis de la pregunta "Crear un promedio de tiempo en el que pueda predecir cada cuánto puede acontecer un terremoto", vamos a utilizar los sismos medidos con la escala "Mw", ya que esta abarca un rango mayor de magnitudes sin alteraciones y, además, es más rigurosa desde el punto de vista físico. Dado que vamos a utilizar los sismos de magnitud Mw, eliminaremos todos los datos anteriores a 1975 para garantizar una mayor confiabilidad, ya que los registros de años anteriores eran menos confiable por lo cual mas properso a tener datos erroneos.</p>
+            
+            <p>Para estimar la frecuencia de terremotos utilizamos la "Ley de Gutenberg-Richter" y la fórmula es:</p>
+            <p>log₁₀(N) = a - b·M</p>
+            <p></p>
+            <p>Los parametros son:</p>
+            <p>N = número de sismos por año con magnitud ≥ M</p>
+            <p>M = magnitud, aplicaremos: (4.5, 5.0, 6.0, 7.0)</p>
+            <p>a = parámetro de productividad sísmica</p>
+            <p>b = parámetro de pendiente</p>
+            <p>Método:</p>
+            <p>Calculamos N para diferentes umbrales de magnitud</p>
+            <p>Obtenemos a y b mediante regresión lineal</p>
+            <p>Aplicamos la fórmula para predecir sismos futuros</p>
+            <p>Y observamos el siguiente grafico</p>
+            
+            <img src="grafico6.png">
+
+            <p>Parámetros</p>
+            <p>a = 5.640</p>
+            <p>b = 0.832</p>
+            <p>Evaluación</p>
+            <p>R²: 0.971</p>
+            <p>RMSE: 0.102</p>
+            <p>Sismos esperados para el próximo año:</p>
+            <p>- Sismos ≥ M4.5: 79.00 por año (cada 4.6 días)</p>
+            <p>- Sismos ≥ M5.0: 30.33 por año (cada 12.0 días)</p>
+            <p>- Sismos ≥ M6.0: 4.47 por año (cada 81.7 días)</p>
+            <p>- Sismos ≥ M7.0: 0.66 por año (cada 1.5 años)</p>
+            <p>Primero verificamos que los parámetros obtenidos son correctos según los rangos establecidos por el Sernageomin: el parámetro "a" debe estar entre 5.3 y 6.1, y el parámetro "b" entre 0.81 y 0.92, lo cual se cumple en ambos casos, ademas de tener un R² cercano a 1 y un RMSE cercano a 0.1, indicando que la regresión lineal se cumple estadísticamente. Por lo tanto, podemos decir que la Ley de Gutenberg-Richter se cumple. Al analizar los resultados, observamos que tienen coherencia física, a mayor magnitud, la frecuencia de sismos disminuye, tal como se espera. La principal limitación de la Ley de Gutenberg-Richter es que te dice la frecuencia de los terremoto no el momento exacto en que ocurrirán los sismos. Adicionalmente, nuestro datos solo abarca 46 años, un período relativamente corto para un análisis perfectamente robusto. Esto se refleja en el tamaño de muestra utilizado para la regresión lineal, que son solamente aproximadamente 800 sismo.</p>
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <title>Reporte de Clasificación (Machine Learning)</title>
+                <style>
+                    /* Estilos CSS para simular la apariencia de un reporte de Python */
+                    .report-container {
+                        font-family: monospace;
+                        white-space: pre; /* Permite saltos de línea y espacios uniformes */
+                        font-size: 14px;
+                        padding: 15px;
+                        background-color: #2e2e2e; /* Fondo oscuro */
+                        color: #ffffff; /* Texto claro */
+                        border-radius: 8px;
+                        overflow-x: auto;
+                    }
+                    .report-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        color: #ffffff;
+                        margin-bottom: 15px;
+                    }
+                    .report-table th, .report-table td {
+                        padding: 5px 10px;
+                        text-align: right;
+                    }
+                    .report-table td:first-child, .report-table th:first-child {
+                        text-align: left; /* Alineación a la izquierda para las etiquetas de clase/promedio */
+                    }
+                    .report-table thead th {
+                        border-bottom: 1px solid #555;
+                        font-weight: bold;
+                        text-align: center;
+                    }
+                    .metric-row td {
+                        border-top: 1px solid #555;
+                        padding-top: 10px;
+                    }
+                </style>
+            </head>
+            <body>
+
+            <div class="report-container">
+                <h2>Reporte de Clasificación</h2>
+                
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>precision</th>
+                            <th>recall</th>
+                            <th>f1-score</th>
+                            <th>support</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0</td><td>0.96</td><td>0.99</td><td>0.97</td><td>1697</td></tr>
+                        <tr><td>1</td><td>0.59</td><td>0.35</td><td>0.44</td><td>99</td></tr>
+                        
+                        <tr class="metric-row"><td>accuracy</td><td></td><td></td><td>0.95</td><td>1796</td></tr>
+                        <tr><td>macro avg</td><td>0.78</td><td>0.67</td><td>0.71</td><td>1796</td></tr>
+                        <tr><td>weighted avg</td><td>0.94</td><td>0.95</td><td>0.95</td><td>1796</td></tr>
+                    </tbody>
+                </table>
+                
+                <p style="font-size: 0.9em; color: #aaa;">
+                    *Nota: La clase 0 está bien predicha (96% precisión), mientras que la clase 1 (la minoritaria, con solo 99 casos) tiene un rendimiento mucho más bajo (35% de exhaustividad).
+                </p>
+
+            </div>
+
+            </body>
+            </html>
+
+            <p>Graficando estos datos tenemos:</p>
+            <img src="grafico7.png">
+            <p>Observamos que la mayoría de las zonas son de baja probabilidad, observamos que existen algunas ubicaciones con alta probabilidad, ahora vamos a clasificar creando un mapa interactivo.</p>
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <title>Página Principal</title>
+            </head>
+            <body>
+                <h1>Mapa interactivos</h1>
+
+                <iframe 
+                    src="mapa_riesgo.html" 
+                    width="100%" 
+                    height="500px" 
+                    title="Contenido Importado">
+                </iframe>
+            </body>
+            </html>
+            <p>Siendo los puntos amarillo menor al 30%, verde entre el 30% al 80% y rojo los de mayor a 80%</p>
+            <p>Ahora grafiquemos solo los de mayor al 70%</p>
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <title>Página Principal</title>
+            </head>
+            <body>
+                <h1>Mapa interactivos</h1>
+
+                <iframe 
+                    src="mapa_alto_riesgo.html" 
+                    width="100%" 
+                    height="500px" 
+                    title="Contenido Importado">
+                </iframe>
+            </body>
+            </html>
+            <p>Con esto podemos observar las zonas de mayor probabilidad a lo largo del país.</p>
+        </div>
+
+        <p style="text-align: center; margin-top: 20px; font-size: 0.9em; color: var(--color-text-dark);">
+            Documentación formal en Proyecto.pdf | Código y datos en el repositorio de GitHub: <a href="https://github.com/Skysilen-t/Proyecto-Ciencia-de-Datos/tree/main/Propuesta%20y%20documento" target="_blank" style="color: #4CAF50;">Skysilen-t/Proyecto-Ciencia-de-Datos</a>
+        </p>
+    </div>
+</body>
+</html>
