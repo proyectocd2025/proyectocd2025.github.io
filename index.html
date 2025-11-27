@@ -581,15 +581,15 @@
             </body>
             </html>
             <p>Ahora observemos una gráfica de estos datos para visualizarlos mejor.</p>
-            <img src="grafico1.png">
+            <img src="image\grafico1.png">
             <p>Ahora veamos estas ubicaciones en un mapa de Chile</p>
-            <img src="mapa1.png" width="1000" height="1000">
+            <img src="image\mapa1.png" width="1000" height="1000">
         </div>
 
         <div class="section-box">
             <h2>3. Analizar los terremotos acontecidos en el país y obtener las regiones y ciudades de mayores riesgos, permitiendo calcular el área de mayor riesgo en el país</h2>
             <p>Primeros observemos como es la distribución de terremotos acontecidos en el país en el trascurso de los años.</p>
-            <img src="mapa2.png" width="1000" height="1000">
+            <img src="image\mapa2.png" width="1000" height="1000">
             <p>Podemos ver una mayor distribución en la zona centro y norte del país, en la zona sur cerca de la Patagonia podemos ver que no es tan afectada.</p>
             <p>Observemos como es la distribución de la frecuencia de terremotos por regiones, para esto te compartimos esta tabla y una gráfica.</p>
             <!DOCTYPE html>
@@ -670,10 +670,10 @@
 
             </body>
             </html>
-            <img src="grafico3.png">
+            <img src="image\grafico3.png">
             <p>Siendo las regiones de Antofagasta, Coquimbo, Valparaíso y Tarapacá las más afectadas.</p>
             <p>Veamos ahora como seria la distribución, pero por ciudades, para ello solo graficaremos las 20 ciudades más afectadas para una mejor visualización.</p>
-            <img src="grafico4.png" width="1000" height="1000">
+            <img src="image\grafico4.png" width="1000" height="1000">
             <p>Obtenemos que Iquique es la ciudad más afectada, donde su frecuencia llega casi hasta los 1000. Para que puedan conocer cuales son las zonas afectadas pueden ver la siguiente imagen que muestra todos los terremotos cercanos que han afectado a la ciudad.</p>
             <!DOCTYPE html>
             <html lang="es">
@@ -694,7 +694,7 @@
         
         <div class="section-box">
             <h2>Crear un promedio de tiempo en el que pueda predecir cada cuanto puede acontecer un terremoto</h2>
-            <img src="grafico5.png">
+            <img src="image\grafico5.png">
             <p>En el análisis de los 9,484 sismos en Chile, que abarcan desde el 19 de marzo de 1904 hasta el 1 de septiembre de 2025, corroboramos que los datos corresponden a magnitudes >= 4.5, con un máximo de 9.5. Esto podemos verificarlo, ya que el único sismo de 9.5 ocurrió en Chile. Sus percentiles se encuentran dentro del rango de 4.5 a 5.1, donde se ubica la mayoría de los sismos superiores a 4.5 y vemos que el grafico los datos estan bien relacionado ya que cada magnitud se disminuye mas del 50% en comparacion a su magnitud anterior pero a la vez hay una escesiva cantidad de sismo entre 4.5 a 5. En conclusión, los datos del dataframe en la columna de magnitud están correctos. Al analizar los datos de magnitud, podemos observar que predominan dos tipos principales: "mb", con 6,170 casos, que es la escala más común para medir sismos entre magnitudes 4 y 6.5; y "Mw" y sus variantes, con 2,873 casos en total, que se utiliza para medir sismos en un rango de 0 a 9.5. Para el análisis de la pregunta "Crear un promedio de tiempo en el que pueda predecir cada cuánto puede acontecer un terremoto", vamos a utilizar los sismos medidos con la escala "Mw", ya que esta abarca un rango mayor de magnitudes sin alteraciones y, además, es más rigurosa desde el punto de vista físico. Dado que vamos a utilizar los sismos de magnitud Mw, eliminaremos todos los datos anteriores a 1975 para garantizar una mayor confiabilidad, ya que los registros de años anteriores eran menos confiable por lo cual mas properso a tener datos erroneos.</p>
             
             <p>Para estimar la frecuencia de terremotos utilizamos la "Ley de Gutenberg-Richter" y la fórmula es:</p>
@@ -711,7 +711,7 @@
             <p>Aplicamos la fórmula para predecir sismos futuros</p>
             <p>Y observamos el siguiente grafico</p>
             
-            <img src="grafico6.png">
+            <img src="image\grafico6.png">
 
             <p>Parámetros</p>
             <p>a = 5.640</p>
@@ -801,7 +801,7 @@
             </html>
 
             <p>Graficando estos datos tenemos:</p>
-            <img src="grafico7.png">
+            <img src="image\grafico7.png">
             <p>Observamos que la mayoría de las zonas son de baja probabilidad, observamos que existen algunas ubicaciones con alta probabilidad, ahora vamos a clasificar creando un mapa interactivo.</p>
             <!DOCTYPE html>
             <html lang="es">
@@ -845,4 +845,5 @@
         </p>
     </div>
 </body>
+
 </html>
